@@ -50,7 +50,7 @@ class MovieViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset.prefetch_related("genres", "actors")
 
-        if self.action == 'list':
+        if self.action == "list":
             genres = self.request.query_params.get("genres")
             actors = self.request.query_params.get("actors")
             title = self.request.query_params.get("title")
@@ -85,7 +85,8 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             queryset = queryset.prefetch_related("tickets").annotate(
                 tickets_available=(
-                        F("cinema_hall__rows") * F("cinema_hall__seats_in_row") - Count("tickets")
+                        F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
+                        - Count("tickets")
                 )
             )
 
