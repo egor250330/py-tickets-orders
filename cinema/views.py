@@ -50,18 +50,19 @@ class MovieViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset.prefetch_related("genres", "actors")
 
-        genres = self.request.query_params.get("genres")
-        actors = self.request.query_params.get("actors")
-        title = self.request.query_params.get("title")
+        if self.action == 'list':
+            genres = self.request.query_params.get("genres")
+            actors = self.request.query_params.get("actors")
+            title = self.request.query_params.get("title")
 
-        if genres:
-            genres_ids = [int(str_id) for str_id in genres.split(",")]
-            queryset = queryset.filter(genres__id__in=genres_ids)
-        if actors:
-            actors_ids = [int(str_id) for str_id in actors.split(",")]
-            queryset = queryset.filter(actors__id__in=actors_ids)
-        if title:
-            queryset = queryset.filter(title__icontains=title)
+            if genres:
+                genres_ids = [int(str_id) for str_id in genres.split(",")]
+                queryset = queryset.filter(genres__id__in=genres_ids)
+            if actors:
+                actors_ids = [int(str_id) for str_id in actors.split(",")]
+                queryset = queryset.filter(actors__id__in=actors_ids)
+            if title:
+                queryset = queryset.filter(title__icontains=title)
 
         return queryset
 
@@ -84,19 +85,17 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         if self.action == "list":
             queryset = queryset.prefetch_related("tickets").annotate(
                 tickets_available=(
-                    F("cinema_hall__rows")
-                    * F("cinema_hall__seats_in_row")
-                    - Count("tickets")
+                        F("cinema_hall__rows") * F("cinema_hall__seats_in_row") - Count("tickets")
                 )
             )
 
-        movie_id = self.request.query_params.get("movie")
-        date = self.request.query_params.get("date")
+            movie_id = self.request.query_params.get("movie")
+            date = self.request.query_params.get("date")
 
-        if movie_id:
-            queryset = queryset.filter(movie=movie_id)
-        if date:
-            queryset = queryset.filter(show_time__date=date)
+            if movie_id:
+                queryset = queryset.filter(movie=movie_id)
+            if date:
+                queryset = queryset.filter(show_time__date=date)
 
         return queryset
 
